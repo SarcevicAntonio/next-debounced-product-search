@@ -1,6 +1,6 @@
 import Head from "next/head";
 import { useRouter } from "next/router";
-import { useState } from "react";
+import { useRef, useState } from "react";
 
 export async function getServerSideProps({ query }) {
   const data = await fetch(
@@ -14,7 +14,7 @@ export async function getServerSideProps({ query }) {
 
 export default function Home({ data }) {
   const [searching, setSearching] = useState(false);
-  const [timeout, setTimeoutState] = useState(null);
+  const timeout = useRef(null);
   const router = useRouter();
 
   function searchProduct(search) {
@@ -24,8 +24,8 @@ export default function Home({ data }) {
 
   function handleSearch(e) {
     setSearching(true);
-    if (timeout) clearTimeout(timeout);
-    setTimeoutState(setTimeout(() => searchProduct(e.target.value), 300));
+    if (timeout.current) clearTimeout(timeout.current);
+    timeout.current = setTimeout(() => searchProduct(e.target.value), 300);
   }
 
   return (
@@ -38,7 +38,7 @@ export default function Home({ data }) {
       </Head>
       <main>
         <input type="text" onChange={handleSearch} />
-        {searching ? "🔍" : ""}
+        {searching ? "..." : ""}
         <ul>
           {data.products.map(({ id, title, price }) => (
             <li key={id}>
