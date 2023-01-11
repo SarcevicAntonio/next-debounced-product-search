@@ -1,6 +1,5 @@
 import Head from "next/head";
-import Link from "next/link";
-import { useState } from "react";
+import { useRouter } from "next/router";
 
 export async function getServerSideProps({ query }) {
   const data = await fetch(
@@ -13,7 +12,11 @@ export async function getServerSideProps({ query }) {
 }
 
 export default function Home({ data }) {
-  const [search, setSearch] = useState("");
+  const router = useRouter();
+
+  function handleSearch(e) {
+    router.push(`/?search=${e.target.value}`);
+  }
   return (
     <>
       <Head>
@@ -23,12 +26,7 @@ export default function Home({ data }) {
         <link rel="icon" href="/favicon.ico" />
       </Head>
       <main>
-        <input
-          type="text"
-          value={search}
-          onChange={(e) => setSearch(e.target.value)}
-        />
-        <Link href={`/?search=${search}`}>search</Link>
+        <input type="text" onChange={handleSearch} />
         <ul>
           {data.products.map(({ id, title, price }) => (
             <li key={id}>
